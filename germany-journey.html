@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weg nach Deutschland – Your guided journey to Germany</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#000;--sf:rgba(255,255,255,.04);--ink:#fff;--mu:rgba(255,255,255,.6);--ln:rgba(255,255,255,.14);--ac:#fff;--acx:#000;--sun:#F2A20C;
+--you:#9DBBFF;--youb:rgba(80,120,255,.2);--doc:#7FE0C3;--docb:rgba(60,200,160,.17);--ai:#C4A8FF;--aib:rgba(150,100,255,.22);--cf:#FFCB6B;--cfb:rgba(242,162,12,.17);--ok:#D5E4DC;--okb:rgba(255,255,255,.09);--bad:#FF9C90;--badb:rgba(255,80,60,.17);
+--hd:'Instrument Serif',serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:#000}
+*{box-sizing:border-box}
+body{margin:0;background:#000 radial-gradient(ellipse 70% 40% at 15% -5%,rgba(255,255,255,.11),transparent 60%) fixed;color:#fff;font:400 16px/1.6 'Barlow',sans-serif}
+h1,h2,h3{font-family:var(--hd);font-style:italic;font-weight:400}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+option{background:#111;color:#fff}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+/* liquid glass */
+.card,.pc,.btn.g,.glass{background:rgba(255,255,255,.03);background-blend-mode:luminosity;backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);border:0;box-shadow:4px 4px 4px rgba(0,0,0,.05),inset 0 1px 1px rgba(255,255,255,.15);position:relative;overflow:hidden}
+.card:before,.pc:before,.btn.g:before,.glass:before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.2) 20%,rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,rgba(255,255,255,.2) 80%,rgba(255,255,255,.5) 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+header{padding:22px 20px 0;max-width:1120px;margin:auto}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand b{font:italic 400 1.7rem/1 var(--hd)}
+.brand span{color:var(--mu);font-size:.85rem;font-weight:300}
+.trk{display:flex;overflow-x:auto;margin:16px 0 0;padding:6px 2px 14px;scrollbar-width:thin}
+.st{flex:1 0 96px;background:none;border:0;padding:0;text-align:left;position:relative;color:var(--mu)}
+.st i{display:block;width:14px;height:14px;border-radius:50%;background:#000;border:2px solid var(--ln);margin-bottom:6px;position:relative;z-index:1}
+.st:before{content:"";position:absolute;left:0;right:0;top:6px;border-top:2px dotted var(--ln)}
+.st.done i{background:#fff;border-color:#fff}.st.done:before{border-top:2px solid rgba(255,255,255,.7)}
+.st.cur i{background:var(--sun);border-color:var(--sun);box-shadow:0 0 0 5px rgba(242,162,12,.3)}
+.st.cur{color:#fff;font-weight:600}
+.st span{font-size:.82rem}
+.st:disabled{cursor:not-allowed;opacity:.5}
+main{max-width:1120px;margin:auto;padding:8px 20px 70px;display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:960px){main.two{grid-template-columns:minmax(0,1fr) 330px}}
+.card{border-radius:24px;padding:26px}
+h1{font-size:clamp(2.8rem,7.5vw,5.4rem);line-height:.9;letter-spacing:-.02em;margin:0 0 16px;max-width:13ch}
+h2{font-size:2rem;line-height:1;margin:0 0 8px;letter-spacing:-.01em}
+h3{font-size:1.25rem;margin:18px 0 8px}
+p{margin:0 0 12px}.mu{color:var(--mu);font-weight:300}
+.paths{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:22px}
+.pc{text-align:left;border-radius:20px;padding:22px;color:#fff;transition:background .2s}
+.pc:hover{background:rgba(255,255,255,.09)}
+.pc b{display:block;font:italic 400 1.6rem/1.1 var(--hd);margin-bottom:6px}
+.pc span{color:var(--mu);font-size:.92rem;font-weight:300}
+.btn{background:#fff;color:#000;border:0;border-radius:999px;padding:11px 24px;font-weight:500;font-size:.92rem;transition:background .2s}
+.btn:hover{background:rgba(255,255,255,.88)}
+.btn.g{color:#fff;background:rgba(255,255,255,.03)}.btn.g:hover{background:rgba(255,255,255,.12)}
+.btn.s{padding:6px 14px;font-size:.82rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+label.l{display:block;font-weight:500;margin-bottom:6px}
+input[type=text],input[type=number],select,textarea{width:100%;max-width:520px;padding:12px 16px;border:1px solid var(--ln);border-radius:16px;background:rgba(255,255,255,.05)}
+textarea{min-height:96px}
+.bar{height:4px;background:var(--ln);border-radius:9px;overflow:hidden;margin:6px 0 18px;max-width:520px}
+.bar div{height:100%;background:#fff;transition:width .3s}
+.chip{display:inline-block;font-size:.72rem;font-weight:500;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.c-you{background:var(--youb);color:var(--you)}.c-doc{background:var(--docb);color:var(--doc)}.c-ai{background:var(--aib);color:var(--ai)}.c-conf{background:var(--cfb);color:var(--cf)}.c-ok{background:var(--okb);color:var(--ok)}.c-none{color:var(--mu);border:1px dashed var(--ln)}
+.c-m{background:var(--docb);color:var(--doc)}.c-x{background:var(--badb);color:var(--bad)}.c-r{background:var(--cfb);color:var(--cf)}
+.pf h3{margin:14px 0 4px;font:500 .8rem 'Barlow',sans-serif;color:var(--mu);letter-spacing:.02em}
+.pf .r{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--ln);font-size:.9rem}
+.pf .r div{min-width:0;overflow-wrap:anywhere}.pf .r small{color:var(--mu);display:block;font-weight:300}
+.leg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.drop{display:block;border:1.5px dashed rgba(255,255,255,.3);border-radius:20px;padding:30px;text-align:center;cursor:pointer;background:rgba(255,255,255,.03)}
+.drop:hover{background:rgba(255,255,255,.08)}
+.li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ln)}
+.li small{color:var(--mu);display:block}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+td,th{padding:10px 8px;border-bottom:1px solid var(--ln);text-align:left;vertical-align:top;font-weight:400}
+th{color:var(--mu)}
+.iss{border:1px solid rgba(242,162,12,.6);background:var(--cfb);border-radius:18px;padding:16px;margin:12px 0}
+.iss label{display:block;margin:6px 0}
+.out{border-radius:18px;padding:18px;margin:16px 0}
+.out b{display:block;font:italic 400 1.6rem/1.1 var(--hd);margin-bottom:4px}
+.out.m{background:var(--docb);color:var(--doc)}.out.r{background:var(--cfb);color:var(--cf)}.out.x{background:var(--badb);color:var(--bad)}
+.note{font-size:.82rem;color:var(--mu);margin-top:14px;font-weight:300}
+#cv{background:#fff;color:#111;border-radius:12px;padding:34px;max-width:720px}
+#cv h2{font-size:2.2rem;margin:0;color:#111}
+#cv h3{font:600 .95rem 'Barlow',sans-serif;border-bottom:2px solid #111;padding-bottom:3px;margin:20px 0 8px;color:#111}
+#cv p{margin:0 0 6px}
+#cv .chip{background:#EEE5FF;color:#5B21B6}
+/* CTA + footer */
+.cta{position:relative;padding:8rem 1.5rem 2rem;text-align:center;overflow:hidden;background:#000}
+@media(min-width:768px){.cta{padding-left:4rem;padding-right:4rem}}@media(min-width:1024px){.cta{padding-left:6rem;padding-right:6rem}}
+.cta video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.cta .fade{position:absolute;left:0;right:0;height:200px;z-index:1;pointer-events:none}
+.cta .fade.t{top:0;background:linear-gradient(to bottom,#000,transparent)}
+.cta .fade.b{bottom:0;background:linear-gradient(to top,#000,transparent)}
+.cin{position:relative;z-index:10;max-width:1120px;margin:auto}
+.cta h2{font-size:clamp(3rem,7vw,4.5rem);line-height:.85;letter-spacing:-.02em;max-width:48rem;margin:0 auto 16px}
+.cta p.sub{color:rgba(255,255,255,.6);font-weight:300;max-width:36rem;margin:0 auto 32px}
+.cta .btns{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+.cta .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px}
+.cta svg{width:18px;height:18px}
+.foot{margin-top:8rem;padding-top:32px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:16px}
+@media(min-width:768px){.foot{flex-direction:row}}
+.foot p{margin:0;color:rgba(255,255,255,.4);font-weight:300;font-size:.75rem}
+.foot nav{display:flex;gap:24px}
+.foot a{color:rgba(255,255,255,.4);text-decoration:none;font-weight:300;font-size:.75rem;transition:color .2s}
+.foot a:hover{color:rgba(255,255,255,.7)}
+@media print{body *{visibility:hidden}#cv,#cv *{visibility:visible}#cv{position:absolute;left:0;top:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>Weg nach Deutschland</b><span>Guided journey for applicants from India</span></div>
+  <nav class="trk" id="trk" aria-label="Journey steps"></nav>
+</header>
+<main id="app"></main>
+<section class="cta" id="cta">
+<video id="ctav" autoplay loop muted playsinline></video>
+<div class="fade t"></div><div class="fade b"></div>
+<div class="cin">
+<h2>Your journey to Germany starts here.</h2>
+<p class="sub">Build your profile, upload your documents and see exactly what you still need. No guesswork, no scattered searching. Just a clear route.</p>
+<div class="btns"><button class="btn g" onclick="cta(0)">Start my journey <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></button><button class="btn" onclick="cta(1)">View requirements <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></button></div>
+<div class="foot"><p>&copy; 2026 Weg nach Deutschland. All rights reserved.</p><nav><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></nav></div>
+</div></section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STEPS=['Start','Profile','Documents','AI review','Checks','Video','Assessment','Gaps','CV'];
+const PATHS={study:['Study','Bachelor’s or Master’s at a German university'],voc:['Vocational training','Ausbildung with a German employer'],work:['Employment','Skilled work with a German employer']};
+const FL={name:['Full name','Personal'],city:['City','Personal'],degree:['Highest education','Education'],field:['Field of study','Education'],university:['University','Education'],gradYear:['Graduation year','Education'],expYears:['Years of experience','Work'],role:['Latest job title','Work'],employer:['Employer','Work'],skills:['Skills','Skills'],german:['German level','Language'],englishTest:['English test','Language'],motivation:['Motivation','Motivation'],goals:['Career goal','Career goals'],finance:['Proof of funds','Funding'],target:['Suggested target','Career goals']};
+const Q=[['name','text','As on your passport'],['city','text','e.g. Pune'],['degree','select',["Class 12","Diploma","Bachelor's","Master's"]],['field','text','e.g. Mechanical Engineering'],['gradYear','number','e.g. 2025'],['expYears','number','Years of full-time work, e.g. 2'],['role','text','e.g. Software Engineer'],['skills','text','Comma separated, e.g. Python, CAD'],['german','select',['None','A1','A2','B1','B2','C1']],['englishTest','text','Optional, e.g. IELTS 6.5'],['motivation','area','Why do you want to go to Germany?'],['goals','area','Where do you want to be in five years?'],['finance','select',['Yes','No','Not sure'],'study']];
+const QT={name:'What is your full name?',city:'Which city do you live in?',degree:'What is your highest completed education?',field:'What did you study?',gradYear:'In which year did you graduate?',expYears:'How many years of full-time work experience do you have?',role:'What was your most recent job title?',skills:'What are your key skills?',german:'What is your current German level?',englishTest:'Have you taken an English test?',motivation:'Why Germany?',goals:'What is your career goal?',finance:'Can you show proof of funds (e.g. blocked account)?'};
+const SAMPLE=['Degree_Certificate_BTech.pdf','Experience_Letter_Infosys.pdf','Goethe_German_A2_Certificate.pdf','Resume_Priya.pdf'];
+const X={degree:{degree:"Bachelor's",field:'Computer Science and Engineering',university:'Visvesvaraya Technological University',gradYear:'2024'},experience:{employer:'Infosys Ltd',role:'Software Engineer',expYears:'1.5'},german:{german:'A2'},english:{englishTest:'IELTS 6.5'},cv:{skills:'Python, SQL, React'}};
+const TL={degree:'Education certificate',experience:'Experience letter',german:'German certificate',english:'English test',cv:'CV'};
+const LV=['None','A1','A2','B1','B2','C1'];
+let S={step:0,path:null,qi:0,F:{},docs:[],vid:0,ai:false};
+
+const f=k=>S.F[k]||(S.F[k]={});
+const norm=v=>String(v??'').toLowerCase().replace(/['’]/g,'').trim();
+const differ=(a,b)=>{a=norm(a);b=norm(b);return !(a===b||a.includes(b)||b.includes(a))};
+function val(k){const o=f(k);if(o.pick!=null)return o.pick;if(k==='skills'&&o.you&&o.doc){const s=[...new Set((o.you+','+o.doc.v).split(',').map(x=>x.trim()).filter(Boolean))];return s.join(', ')}return o.you??o.doc?.v??null}
+function st(k){const o=f(k);if(o.pick!=null)return 'ok';if(o.you!=null&&o.doc&&!['skills','motivation','goals'].includes(k)&&differ(o.you,o.doc.v))return 'conf';if(o.you!=null)return 'you';if(o.doc)return 'doc';if(o.ai)return 'ai';return 'none'}
+const CH={you:'Provided by you',doc:'Extracted',ai:'AI suggestion',conf:'Needs confirmation',ok:'Confirmed',none:'Not yet given'};
+const chip=k=>{const s=st(k);return `<span class="chip c-${s}">${CH[s]}</span>`};
+const has=t=>S.docs.some(d=>d.type===t&&d.done);
+const lvl=()=>Math.max(0,LV.indexOf(val('german')));
+const keys=()=>Object.keys(FL);
+
+function detect(n){n=n.toLowerCase();if(/ielts|toefl/.test(n))return'english';if(/german|goethe|telc|testdaf|deutsch|language/.test(n))return'german';if(/experience|employ|relieving|offer|payslip/.test(n))return'experience';if(/cv|resume/.test(n))return'cv';return'degree'}
+function addDocs(names){names.forEach(n=>{const d={name:n,type:detect(n),done:false};S.docs.push(d);setTimeout(()=>{d.done=true;Object.entries(X[d.type]).forEach(([k,v])=>{f(k).doc={v,from:d.name}});render()},900)});render()}
+function fileDocs(e){addDocs([...e.target.files].map(x=>x.name))}
+function sampleDocs(){addDocs(SAMPLE.filter(n=>!S.docs.some(d=>d.name===n)))}
+function vidDo(){S.vid=1;render();setTimeout(()=>{S.vid=2;f('motivation').doc={v:'I want to work in a strong engineering culture; Germany’s automotive and industrial software sector inspires me.',from:'intro video'};f('goals').doc={v:'Grow into a software architect for automotive systems within five years.',from:'intro video'};render()},1600)}
+
+function setPath(p){S.path=p;S.step=1;render()}
+function go(i){S.step=i;render();scrollTo(0,0)}
+function nextQ(){const qs=QL(),el=$('#qin');const v=el?el.value.trim():'';const k=qs[S.qi][0];if(v)f(k).you=v;S.qi++;render()}
+const QL=()=>Q.filter(q=>!q[3]||q[3]===S.path);
+function acc(k){f(k).pick=val(k)??f(k).ai;render()}
+function rej(k){f(k).ai=null;render()}
+function choose(k,v){f(k).pick=v;render()}
+function fill(k){const v=$('#m_'+k).value.trim();if(v){f(k).you=v;render()}}
+function confirmAll(){keys().forEach(k=>{if(st(k)==='doc')f(k).pick=val(k)});render()}
+
+function req(){
+ const P=S.path,r=[];const add=(t,s,n,step)=>r.push({t,s,n,step});
+ const chk=(k,t,ok,step)=>{const s=st(k);if(s==='none')add(t,'x','Not provided yet',step);else if(s==='you'||s==='ok')add(t,'m',ok||'Provided',step);else add(t,'r',s==='conf'?'Conflicting values – confirm the right one':'Extracted from a document – confirm it',4)};
+ const qual=(t,hi)=>{const d=val('degree');if(!d)return add(t,'x','Add your education',1);if(st('degree')==='conf')return add(t,'r','Education level conflicts with your document',4);const okd=hi?["Bachelor's","Master's"].includes(d):d!=='Class 12'||P==='voc';if(!okd)return add(t,'x',hi?'A Bachelor’s degree or higher is required':'A recognised qualification is required',2);has('degree')?add(t,'m',d+' – supported by a document'):add(t,'r','Self-declared – upload your certificate',2)};
+ const lang=(t,min,eng)=>{const g=lvl();const e=eng&&val('englishTest');if(st('german')==='conf')return add(t,'r','German level conflicts with your certificate',4);if(g>=min||e){const doc=(g>=min&&has('german'))||(e&&has('english'));doc?add(t,'m',g>=min?'German '+LV[g]:'English '+e):add(t,'r','Self-declared – upload the certificate',2)}else add(t,'x',g?`German ${LV[g]} found; ${LV[min]} needed`:'No language certificate found',2)};
+ const dc=(t,ty,l)=>add(t,has(ty)?'m':'x',has(ty)?'Uploaded':l,2);
+ if(P==='study'){qual('Bachelor’s degree or higher',1);chk('gradYear','Graduation year confirmed');dc('Degree certificate uploaded','degree','Upload your degree certificate');lang('German B2 or English test (IELTS/TOEFL)',4,1);add('Proof of funds',val('finance')==='Yes'?'r':'x',val('finance')==='Yes'?'Upload bank / blocked-account proof':'No proof of funds yet',1);chk('motivation','Motivation statement')}
+ if(P==='voc'){qual('School or higher education completed',0);dc('Education certificate uploaded','degree','Upload your certificate');lang('German B1 or higher',3,0);const t=val('field')||val('goals');add('Chosen training field',t?'m':'x',t?String(val('field')||'From career goal'):'Tell us which trade you want',1);add('Identity and contact',val('name')&&val('city')?'m':'x',val('name')&&val('city')?'Provided':'Add name and city',1);chk('motivation','Motivation')}
+ if(P==='work'){qual('Recognised degree or qualification',0);const n=parseFloat(val('expYears'));if(isNaN(n))add('At least 2 years of experience','x','Add your experience',1);else if(st('expYears')==='conf'||st('expYears')==='doc')add('At least 2 years of experience','r','Experience years need confirmation',4);else add('At least 2 years of experience',n>=2?(has('experience')?'m':'r'):'x',n>=2?(has('experience')?n+' years, letter uploaded':'Upload an experience letter'):`${n} years found; 2 needed`,2);dc('Experience letter uploaded','experience','Upload your experience letter');lang('German B1 (recommended)',3,0);chk('goals','Clear career goal');add('CV available',has('cv')?'m':'r',has('cv')?'Uploaded':'Generate one in the last step',8)}
+ return r}
+const BL={m:'Met',x:'Missing',r:'Needs review'};
+
+function panel(){const g={};keys().forEach(k=>(g[FL[k][1]]=g[FL[k][1]]||[]).push(k));
+ return `<aside class="card pf"><h2>Your profile</h2><div class="leg"><span class="chip c-you">Provided by you</span><span class="chip c-doc">Extracted</span><span class="chip c-ai">AI suggestion</span><span class="chip c-conf">Needs confirmation</span></div>`+Object.entries(g).map(([n,ks])=>`<h3>${n}</h3>`+ks.map(k=>{const v=k==='target'?(f(k).ai||null):val(k);const from=f(k).doc&&st(k)==='doc'?f(k).doc.from:'';return `<div class="r"><div><small>${FL[k][0]}</small>${v?esc(v):'<span class="mu">–</span>'}${from?`<small>from ${esc(from)}</small>`:''}</div><div>${chip(k)}</div></div>`}).join('')).join('')+`</aside>`}
+
+const V={
+0(){return `<section class="card"><h1>Your route to Germany, one step at a time.</h1><p class="mu" style="max-width:56ch">Tell us what you want to do. We build your profile, read your documents, flag what is missing, check your eligibility and write your CV, so you don’t have to hunt for it all yourself.</p><h3>What do you want to do in Germany?</h3><div class="paths">${Object.entries(PATHS).map(([k,[a,b]])=>`<button class="pc" onclick="setPath('${k}')"><b>${a}</b><span>${b}</span></button>`).join('')}</div></section>`},
+1(){const qs=QL(),i=S.qi;if(i>=qs.length)return `<section class="card"><h2>Profile started</h2><p>Your answers are saved on the right. Next, upload your documents so we can fill in and cross-check the rest.</p><div class="row"><button class="btn g" onclick="S.qi=0;render()">Review answers</button><button class="btn" onclick="go(2)">Upload documents</button></div></section>`+panel();
+ const [k,t,o]=qs[i],cur=val(k)||'';let inp=t==='select'?`<select id="qin"><option value="">Choose…</option>${o.map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('')}</select>`:t==='area'?`<textarea id="qin" placeholder="${esc(o)}">${esc(cur)}</textarea>`:`<input id="qin" type="${t}" placeholder="${esc(o)}" value="${esc(cur)}">`;
+ return `<section class="card"><span class="chip c-you">${FL[k][1]}</span><h2 style="margin-top:8px">${QT[k]}</h2><div class="bar"><div style="width:${i/qs.length*100}%"></div></div><label class="l" for="qin">${FL[k][0]}</label>${inp}<div class="row"><button class="btn g" ${i?'':'disabled'} onclick="S.qi--;render()">Back</button><button class="btn" onclick="nextQ()">Save and continue</button><button class="btn g" onclick="S.qi++;render()">Skip for now</button></div><p class="note">Question ${i+1} of ${qs.length}. Skipped questions are picked up in the checks step.</p></section>`+panel()},
+2(){return `<section class="card"><h2>Upload your documents</h2><p class="mu">Degree and education certificates, experience letters, language certificates and your existing CV.</p><label class="drop"><input type="file" multiple hidden onchange="fileDocs(event)"><b>Choose files</b><br><span class="mu">PDF, JPG or PNG</span></label><div class="row"><button class="btn g" onclick="sampleDocs()">Try with sample documents</button></div><div style="margin-top:14px">${S.docs.map(d=>`<div class="li"><div>${esc(d.name)}<small>${TL[d.type]}</small></div>${d.done?'<span class="chip c-doc">Data extracted</span>':'<span class="chip c-ai">Reading…</span>'}</div>`).join('')||'<p class="mu">No documents yet.</p>'}</div><p class="note">Demo mode: extraction is simulated from the file type and uses sample values. A production version would connect OCR and an AI model.</p><div class="row"><button class="btn g" onclick="go(1)">Back</button><button class="btn" onclick="go(3)" ${S.docs.some(d=>d.done)?'':'disabled'}>See what the AI found</button></div></section>`+panel()},
+3(){if(!S.ai&&S.docs.length){S.ai=true;const t={study:'Master’s in '+(val('field')||'your field'),voc:'Ausbildung as IT specialist (Fachinformatiker)',work:'Software Engineer – EU Blue Card route'}[S.path];f('target').ai=t}
+ const rows=keys().filter(k=>st(k)!=='none').map(k=>{const s=st(k);let a='';if(s==='doc')a=`<button class="btn s" onclick="acc('${k}')">Confirm</button>`;if(s==='ai')a=`<button class="btn s" onclick="acc('${k}')">Accept</button> <button class="btn s g" onclick="rej('${k}')">Dismiss</button>`;if(s==='conf')a=`<button class="btn s g" onclick="go(4)">Resolve</button>`;const v=k==='target'?f(k).ai:val(k);return `<tr><td>${FL[k][0]}</td><td>${esc(v)}</td><td>${chip(k)}</td><td>${a}</td></tr>`}).join('');
+ return `<section class="card"><h2>What the AI found</h2><p class="mu">Every value shows where it came from. Nothing counts as confirmed until you say so.</p><div class="tw"><table><tr><th>Field</th><th>Value</th><th>Source</th><th></th></tr>${rows}</table></div><div class="row"><button class="btn g" onclick="go(2)">Back</button><button class="btn g" onclick="confirmAll()">Confirm all extracted</button><button class="btn" onclick="go(4)">Check for gaps</button></div></section>`+panel()},
+4(){const need=['name','degree','field','gradYear','german','motivation','goals'].concat(S.path==='work'?['expYears']:[]);const conf=keys().filter(k=>st(k)==='conf'),miss=need.filter(k=>st(k)==='none'),un=keys().filter(k=>st(k)==='doc');
+ let h=conf.map(k=>{const o=f(k);return `<div class="iss"><b>${FL[k][0]} doesn’t match</b><p>You said <b>${esc(o.you)}</b>, but ${esc(o.doc.from)} says <b>${esc(o.doc.v)}</b>. Which is correct?</p><label><input type="radio" name="c${k}" onchange="choose('${k}','${esc(o.you).replace(/'/g,"\\'")}')"> ${esc(o.you)} (my answer)</label><label><input type="radio" name="c${k}" onchange="choose('${k}','${esc(o.doc.v).replace(/'/g,"\\'")}')"> ${esc(o.doc.v)} (from document)</label></div>`}).join('');
+ h+=miss.map(k=>`<div class="iss"><b>Missing: ${FL[k][0]}</b><div class="row" style="margin-top:8px"><input type="text" id="m_${k}" placeholder="${esc(FL[k][0])}"><button class="btn s" onclick="fill('${k}')">Save</button></div></div>`).join('');
+ if(un.length)h+=`<div class="iss"><b>${un.length} extracted value${un.length>1?'s':''} still need your confirmation</b><p>${un.map(k=>FL[k][0]).join(', ')}</p><button class="btn s" onclick="confirmAll()">Confirm all</button></div>`;
+ return `<section class="card"><h2>Missing or inconsistent information</h2><p class="mu">We compared your answers with your documents.</p>${h||'<div class="out m"><b>Everything lines up</b>No gaps or conflicts found.</div>'}<div class="row"><button class="btn g" onclick="go(3)">Back</button><button class="btn" onclick="go(5)">Continue to video</button></div></section>`+panel()},
+5(){return `<section class="card"><h2>Introduction video</h2><p class="mu">A 1–2 minute video about your background, why Germany and your career goals. Optional, but it helps fill your profile.</p>${S.vid===0?`<label class="drop"><input type="file" accept="video/*" hidden onchange="vidDo()"><b>Choose a video</b></label><div class="row"><button class="btn g" onclick="vidDo()">Try with a sample video</button></div>`:S.vid===1?'<div class="out r"><b>Processing video…</b>Listening for background, motivation and goals.</div>':`<div class="out m"><b>Video processed</b>Motivation and career goal were added to your profile as extracted information. Confirm them in the AI review.</div><div class="tw"><table><tr><th>Background</th><td>${esc(val('degree')||'Graduate')} in ${esc(val('field')||'your field')}${val('role')?', working as '+esc(val('role')):''}</td></tr><tr><th>Motivation</th><td>${esc(f('motivation').doc.v)}</td></tr><tr><th>Career goal</th><td>${esc(f('goals').doc.v)}</td></tr></table></div>`}<p class="note">Demo mode: video analysis is simulated.</p><div class="row"><button class="btn g" onclick="go(4)">Back</button><button class="btn" onclick="go(6)">${S.vid===2?'Check my qualification':'Skip video'}</button></div></section>`+panel()},
+6(){const r=req(),x=r.filter(a=>a.s==='x').length,q=r.filter(a=>a.s==='r').length;const o=x?['x','Not yet ready',`${x} requirement${x>1?'s are':' is'} missing.`]:q?['r','Promising – review needed',`${q} item${q>1?'s':''} need review before you qualify.`]:['m','Likely qualified','All requirements are met.'];
+ return `<section class="card"><h2>Qualification assessment</h2><p class="mu">Pathway: ${PATHS[S.path][0]}</p><div class="tw"><table>${r.map(a=>`<tr><td>${a.t}</td><td><span class="chip c-${a.s}">${BL[a.s]}</span></td><td class="mu">${esc(a.n)}</td></tr>`).join('')}</table></div><div class="out ${o[0]}"><b>Preliminary outcome: ${o[1]}</b>${o[2]}</div><p class="note">Preliminary and based on simplified demo rules. Check final requirements with the university, employer, or the German mission before applying.</p><div class="row"><button class="btn g" onclick="go(5)">Back</button><button class="btn" onclick="go(7)">${x+q?'See what’s missing':'Continue'}</button></div></section>`+panel()},
+7(){const r=req().filter(a=>a.s!=='m');return `<section class="card"><h2>What you still need</h2>${r.length?r.map(a=>`<div class="li"><div><b>${a.t}</b><small>${esc(a.n)}</small></div><div><span class="chip c-${a.s}">${BL[a.s]}</span> <button class="btn s g" onclick="go(${a.step||2})">Fix</button></div></div>`).join(''):'<div class="out m"><b>Nothing missing</b>You meet every requirement.</div>'}<div class="row"><button class="btn g" onclick="go(6)">Back</button><button class="btn" onclick="go(8)">Generate my CV</button></div></section>`+panel()},
+8(){const g=k=>val(k),n=g('name')||'Your name',ex=g('expYears'),tbc=keys().filter(k=>['doc','conf','ai','none'].includes(st(k))&&k!=='target'&&['name','degree','field','gradYear','expYears','german'].includes(k));
+ const sum=`${g('degree')||'Graduate'}${g('field')?' in '+g('field'):''}${g('gradYear')?' ('+g('gradYear')+')':''}${ex?` with ${ex} years of experience${g('role')?' as '+g('role'):''}`:''}. ${g('german')&&g('german')!=='None'?'German level '+g('german')+'. ':''}Seeking ${{study:'a place at a German university',voc:'a vocational training position (Ausbildung) in Germany',work:'a skilled role in Germany'}[S.path]}${g('goals')?'. Goal: '+g('goals'):''}`;
+ return `<section class="card"><h2>Your professional CV</h2><p class="mu">Built from your profile and documents. Print it to save as PDF.</p><div id="cv"><h2>${esc(n)}</h2><p>${esc(g('city')||'India')}</p><h3>Profile <span class="chip c-ai">AI-written</span></h3><p>${esc(sum)}</p>${g('degree')?`<h3>Education</h3><p><b>${esc(g('degree'))}${g('field')?', '+esc(g('field')):''}</b></p><p>${esc(g('university')||'')} ${g('gradYear')?'· '+esc(g('gradYear')):''}</p>`:''}${g('role')||g('employer')?`<h3>Experience</h3><p><b>${esc(g('role')||'')}</b> ${g('employer')?'– '+esc(g('employer')):''}</p><p>${ex?esc(ex)+' years':''}</p>`:''}${g('skills')?`<h3>Skills</h3><p>${esc(g('skills'))}</p>`:''}<h3>Languages</h3><p>English${g('englishTest')?' – '+esc(g('englishTest')):''}</p><p>German – ${esc(g('german')||'not stated')}</p>${g('motivation')?`<h3>Motivation</h3><p>${esc(g('motivation'))}</p>`:''}</div>${tbc.length?`<p class="note">Still unconfirmed in this CV: ${tbc.map(k=>FL[k][0]).join(', ')}. Resolve them in the checks step first.</p>`:''}<div class="row"><button class="btn g" onclick="go(7)">Back</button><button class="btn" onclick="print()">Print or save as PDF</button><button class="btn g" onclick="S={step:0,path:null,qi:0,F:{},docs:[],vid:0,ai:false};render()">Start over</button></div></section>`+(0?'':panel())}
+};
+function render(){
+ $('#trk').innerHTML=STEPS.map((s,i)=>`<button class="st ${i<S.step?'done':''} ${i===S.step?'cur':''}" ${S.path||i===0?'':'disabled'} onclick="go(${i})" ${i===S.step?'aria-current="step"':''}><i></i><span>${s}</span></button>`).join('');
+ const a=$('#app');a.className=S.step>0?'two':'';a.innerHTML=V[S.step]()}
+render();
+
+/* CTA + footer: HLS video background and buttons */
+function cta(v){scrollTo({top:0,behavior:'smooth'});go(v&&S.path?6:0)}
+(function(){const v=document.getElementById('ctav'),src='https://stream.mux.com/8wrHPCX2dC3msyYU9ObwqNdm00u3ViXvOSHUMRYSEe5Q.m3u8';
+ try{if(window.Hls&&Hls.isSupported()){const h=new Hls();h.loadSource(src);h.attachMedia(v)}else if(v.canPlayType('application/vnd.apple.mpegurl'))v.src=src}catch(e){}
+ v.addEventListener('error',()=>{v.style.display='none'})})();
+</script>
+</body>
+</html>
