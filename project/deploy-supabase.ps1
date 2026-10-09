@@ -17,6 +17,7 @@ try {
   Invoke-Supabase -Arguments @('functions', 'deploy', 'analyze-introduction')
   Invoke-Supabase -Arguments @('functions', 'deploy', 'analyze-document')
   Invoke-Supabase -Arguments @('functions', 'deploy', 'generate-cv')
+  Invoke-Supabase -Arguments @('functions', 'deploy', 'journey-assistant')
   Invoke-Supabase -Arguments @('functions', 'deploy', 'resolve-account-role', '--no-verify-jwt')
   Invoke-Supabase -Arguments @('functions', 'deploy', 'admin-review', '--no-verify-jwt')
   Invoke-Supabase -Arguments @('functions', 'deploy', 'request-admin-otp', '--no-verify-jwt')

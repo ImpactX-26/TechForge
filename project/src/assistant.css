@@ -1,0 +1,195 @@
+.nav-help {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-help:hover {
+  border-color: var(--green);
+}
+
+.nav-help > span {
+  display: grid;
+  gap: 2px;
+}
+
+.nav-help small {
+  color: var(--muted);
+}
+
+.journey-assistant {
+  position: fixed;
+  z-index: 20;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 32px));
+  height: min(560px, calc(100dvh - 48px));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 60px rgb(23 63 55 / 20%);
+}
+
+.journey-assistant > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  color: #fff;
+  background: var(--green);
+}
+
+.journey-assistant > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.journey-assistant > header span {
+  display: grid;
+  gap: 2px;
+}
+
+.journey-assistant > header small {
+  color: rgb(255 255 255 / 75%);
+}
+
+.journey-assistant > header > button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.journey-assistant > header > button:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.assistant-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.assistant-message {
+  max-width: 88%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.assistant-message.assistant {
+  align-self: flex-start;
+  color: var(--ink);
+  background: var(--soft);
+}
+
+.assistant-message.user {
+  align-self: flex-end;
+  color: #fff;
+  background: var(--green);
+}
+
+.assistant-error {
+  color: #9b352f;
+  font-size: 13px;
+}
+
+.assistant-hint {
+  padding: 0 16px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.assistant-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.assistant-disclaimer {
+  padding: 0 14px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.document-replacement-hint,
+.document-ai-flag {
+  color: #8b3b1d;
+  font-weight: 600;
+}
+
+.assistant-form textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  max-height: 110px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #173f37;
+  font: inherit;
+}
+
+.assistant-form textarea::placeholder {
+  color: #173f37;
+  opacity: 0.65;
+}
+
+.assistant-form textarea:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
+}
+
+.assistant-form button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--green);
+  cursor: pointer;
+}
+
+.assistant-form button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+@media (max-width: 600px) {
+  .journey-assistant {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    height: min(560px, calc(100dvh - 24px));
+  }
+}

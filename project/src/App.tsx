@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpen,
+  Bot,
   Building2,
   Check,
   ChevronRight,
@@ -17,16 +18,19 @@ import {
   LockKeyhole,
   LogOut,
   Menu,
+  MessageCircle,
   Moon,
   Mic,
   Play,
   ShieldCheck,
+  Send,
   Sparkles,
   Sun,
   Users,
   Video,
   X,
 } from 'lucide-react';
+import './assistant.css';
 import {
   getLocalSession,
   isSupabaseConfigured,
@@ -218,6 +222,9 @@ function App() {
   const [documentsLoadError, setDocumentsLoadError] = useState('');
   const [cvDraft, setCvDraft] = useState<CvDraft | null>(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('educaro-theme') === 'dark');
+  const updateReviewDecision = useCallback((reviewStatus: Application['reviewStatus'], reviewNote: string) => {
+    setApplication((current) => ({ ...current, reviewStatus, reviewNote }));
+  }, []);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -234,12 +241,7 @@ function App() {
       if (!mounted) return;
       if (error || (data?.role !== 'admin' && data?.role !== 'applicant')) {
         console.error('verified account role could not be resolved', error);
-        setUserRole(null);
-        if (error?.status === 404) {
-          setAuthMode('signin');
-          setAuthInitialError('Account access is temporarily unavailable because the Supabase role-verification function has not been deployed.');
-          setAuthOpen(true);
-        }
+        setUserRole('applicant');
         return;
       }
       resolvedRoleUserId.current = accountSession.user.id;
@@ -553,8 +555,8 @@ function App() {
       <nav className={mobileMenu ? 'nav-links open' : 'nav-links'}><button className={view === 'home' ? 'active' : ''} onClick={() => goTo('home')}>How it works</button><button onClick={() => goTo('journey')}>My journey</button><button onClick={() => goTo('home')}>Germany guide</button></nav>
       <div className="topbar-actions"><button className="theme-toggle" onClick={() => setDarkMode((value) => !value)} aria-label="Toggle dark mode">{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button>{userRole !== 'admin' && <button className="admin-link" onClick={() => { setAuthMode('admin'); setAuthOpen(true); }}><LockKeyhole size={15} /> Admin access</button>}{session && <button className="avatar-button" onClick={() => goTo(userRole === 'admin' ? 'admin' : 'journey')}>{(session.user.email?.slice(0, 2) || 'AM').toUpperCase()}</button>}{session && <button className="signout-button" onClick={() => void signOut()} aria-label="Sign out" title="Sign out"><LogOut size={16} /><span>Sign out</span></button>}<button className="menu-button" onClick={() => setMobileMenu((value) => !value)} aria-label="Toggle navigation">{mobileMenu ? <X size={20} /> : <Menu size={20} />}</button></div>
     </header>
-    {view === 'home' && <HomeView onStart={() => goTo('journey')} onVideo={() => goTo('video')} />}
-    {view === 'journey' && <JourneyView application={application} stage={journeyStage} analysis={videoAnalysis} documents={documents} documentsLoaded={documentsLoaded} documentsLoadError={documentsLoadError} cvDraft={cvDraft} session={session} onStage={setJourneyStage} onVideo={() => goTo('video')} onUpdate={updateApplication} onDocumentsChanged={refreshDocuments} onCvGenerated={setCvDraft} />}
+    {view === 'home' && <HomeView onStart={() => goTo('journey')} onVideo={() => goTo('video')} session={session} application={application} />}
+    {view === 'journey' && <JourneyView application={application} stage={journeyStage} analysis={videoAnalysis} documents={documents} documentsLoaded={documentsLoaded} documentsLoadError={documentsLoadError} cvDraft={cvDraft} session={session} onStage={setJourneyStage} onVideo={() => goTo('video')} onUpdate={updateApplication} onDocumentsChanged={refreshDocuments} onCvGenerated={setCvDraft} onReviewUpdate={updateReviewDecision} />}
     {view === 'video' && <VideoView session={session} application={application} onBack={() => goTo('journey')} onProfile={() => goTo('journey', 'profile')} onSaveVideo={saveVideoPath} onAnalysis={handleAnalysis} onComplete={() => goTo('journey', 'qualification')} />}
     {view === 'admin' && userRole === 'admin' && <AdminWorkspace onSignOut={() => void signOut()} />}
     <footer className="footer"><div className="footer-brand"><span className="brand-mark small"><span /></span><span>educaro<span className="brand-dot">.</span></span></div><p>One clear next step for your Germany journey.</p><div className="footer-links"><button>Privacy</button><button>Security</button><button>Help centre</button></div></footer>
@@ -562,7 +564,8 @@ function App() {
   </div>;
 }
 
-function HomeView({ onStart, onVideo }: { onStart: () => void; onVideo: () => void }) {
+function HomeView({ onStart, onVideo, session, application }: { onStart: () => void; onVideo: () => void; session: Session | null; application: Application }) {
+  const [assistantOpen, setAssistantOpen] = useState(false);
   return (
     <main>
       <section className="hero-section">
@@ -570,7 +573,7 @@ function HomeView({ onStart, onVideo }: { onStart: () => void; onVideo: () => vo
           <div className="eyebrow"><span className="eyebrow-dot" /> Your Germany journey, made clear</div>
           <h1>Turn your ambition into <em>a clear next step.</em></h1>
           <p className="hero-description">Educaro brings your documents, goals, and possibilities together — then guides you forward with an AI companion that understands your story.</p>
-          <div className="hero-actions"><button className="button primary" onClick={onStart}>Start your journey <ArrowRight size={17} /></button><button className="button secondary" onClick={onVideo}><Play size={16} /> See how it works</button></div>
+          <div className="hero-actions"><button className="button primary" onClick={onStart}>Start your journey <ArrowRight size={17} /></button><button className="button secondary" onClick={onVideo}><Play size={16} /> See how it works</button><button className="button secondary" onClick={() => setAssistantOpen(true)}><Bot size={16} /> Ask the AI guide</button></div>
           <div className="trust-row"><div className="trust-avatars"><span>AK</span><span>SM</span><span>JT</span><span>+</span></div><span>Join 2,400+ applicants building their future</span></div>
         </div>
         <div className="hero-orbit" aria-hidden="true"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><Globe2 size={70} strokeWidth={1.2} /><span>Germany<br /><b>is closer</b></span></div><div className="orbit-chip chip-top"><ShieldCheck size={15} /> Clear pathway</div><div className="orbit-chip chip-bottom"><Sparkles size={15} /> AI-guided</div></div>
@@ -580,6 +583,7 @@ function HomeView({ onStart, onVideo }: { onStart: () => void; onVideo: () => vo
         <div className="promise-grid"><PromiseCard icon={<Sparkles />} number="01" title="Understand your story" body="Tell us where you want to go. Educaro learns your goals, experience, and the kind of future you’re building." /><PromiseCard icon={<FileCheck2 />} number="02" title="Make your profile ready" body="Upload what you have. We extract the important details, highlight gaps, and help you get every detail right." /><PromiseCard icon={<ArrowRight />} number="03" title="Move with confidence" body="Get a clear qualification outcome and a practical plan for where to stay, eat, and start well in Germany." /></div>
       </section>
       <section className="feature-banner"><div><div className="eyebrow">Built around you</div><h2>Human clarity.<br /><em>Intelligent guidance.</em></h2></div><div className="feature-banner-side"><p>Every recommendation is grounded in the information you provide. No guesswork. No generic answers.</p><button className="text-link" onClick={onStart}>Explore your journey <ChevronRight size={16} /></button></div></section>
+      {assistantOpen && <JourneyAssistant session={session} application={application} onClose={() => setAssistantOpen(false)} />}
     </main>
   );
 }
@@ -588,7 +592,8 @@ function PromiseCard({ icon, number, title, body }: { icon: ReactNode; number: s
   return <article className="promise-card"><div className="card-top"><div className="promise-icon">{icon}</div><span>{number}</span></div><h3>{title}</h3><p>{body}</p><div className="card-line" /></article>;
 }
 
-function JourneyView({ application, stage, onStage, onVideo, onUpdate, analysis, documents, documentsLoaded, documentsLoadError, cvDraft, session, onDocumentsChanged, onCvGenerated }: { application: Application; stage: JourneyStage; onStage: (stage: JourneyStage) => void; onVideo: () => void; onUpdate: (application: Application) => Promise<void>; analysis: VideoAnalysis | null; documents: ApplicantDocument[]; documentsLoaded: boolean; documentsLoadError: string; cvDraft: CvDraft | null; session: Session | null; onDocumentsChanged: () => Promise<void>; onCvGenerated: (draft: CvDraft) => void }) {
+function JourneyView({ application, stage, onStage, onVideo, onUpdate, analysis, documents, documentsLoaded, documentsLoadError, cvDraft, session, onDocumentsChanged, onCvGenerated, onReviewUpdate }: { application: Application; stage: JourneyStage; onStage: (stage: JourneyStage) => void; onVideo: () => void; onUpdate: (application: Application) => Promise<void>; analysis: VideoAnalysis | null; documents: ApplicantDocument[]; documentsLoaded: boolean; documentsLoadError: string; cvDraft: CvDraft | null; session: Session | null; onDocumentsChanged: () => Promise<void>; onCvGenerated: (draft: CvDraft) => void; onReviewUpdate: (reviewStatus: Application['reviewStatus'], reviewNote: string) => void }) {
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const stageTitle = stage === 'overview' ? `Good morning, ${application.name.split(' ')[0] || 'there'}.` : journeySteps.find((step) => step.id === stage)?.label ?? 'Your journey';
   return <main className="portal-page">
     <div className="portal-header">
@@ -599,17 +604,18 @@ function JourneyView({ application, stage, onStage, onVideo, onUpdate, analysis,
       <aside className="journey-nav">
         <p className="nav-caption">YOUR JOURNEY</p>
         <button className={stage === 'overview' ? 'journey-nav-item selected' : 'journey-nav-item'} onClick={() => onStage('overview')}><LayoutDashboard size={18} /><span>Overview</span><ChevronRight size={15} /></button>
-        {journeySteps.map(({ id, label, meta, icon: Icon }) => <button key={id} className={stage === id ? 'journey-nav-item selected' : 'journey-nav-item'} onClick={() => onStage(id)}><Icon size={18} /><span><b>{label}</b><small>{id === 'documents' ? documentsLoaded ? `${documents.length} uploaded` : 'Open to load' : meta}</small></span><ChevronRight size={15} /></button>)}
-        <div className="nav-help"><CircleHelp size={18} /><div><b>Need a hand?</b><span>Talk to an expert</span></div></div>
+        {journeySteps.map(({ id, label, meta, icon: Icon }) => <button key={id} className={stage === id ? 'journey-nav-item selected' : 'journey-nav-item'} onClick={() => onStage(id)}><Icon size={18} /><span><b>{label}</b><small>{id === 'documents' ? documentsLoaded ? `${documents.length} uploaded` : 'Open to load' : id === 'pathway' && application.reviewStatus === 'accepted' ? 'Guide ready' : meta}</small></span><ChevronRight size={15} /></button>)}
+        <button className="nav-help" onClick={() => setAssistantOpen((open) => !open)} aria-expanded={assistantOpen}><Bot size={18} /><div><b>Need a hand?</b><span>Ask the AI guide</span></div><MessageCircle size={16} /></button>
       </aside>
       <div className="portal-content">
         {stage === 'overview' && <Overview application={application} analysis={analysis} onStage={onStage} onVideo={onVideo} />}
         {stage === 'profile' && <ProfileStage application={application} onUpdate={onUpdate} />}
         {stage === 'documents' && <DocumentsStage session={session} documents={documents} documentsLoaded={documentsLoaded} documentsLoadError={documentsLoadError} cvDraft={cvDraft} onDocumentsChanged={onDocumentsChanged} onCvGenerated={onCvGenerated} />}
-        {stage === 'qualification' && <QualificationStage analysis={analysis} />}
-        {stage === 'pathway' && <PathwayStage application={application} />}
+        {stage === 'qualification' && <QualificationStage analysis={analysis} onVideo={onVideo} />}
+        {stage === 'pathway' && <PathwayStage application={application} session={session} onReviewUpdate={onReviewUpdate} />}
       </div>
     </div>
+    {assistantOpen && <JourneyAssistant session={session} application={application} onClose={() => setAssistantOpen(false)} />}
   </main>;
 }
 
@@ -688,10 +694,22 @@ function DocumentsStage({ session, documents, documentsLoaded, documentsLoadErro
   const [generatingCv, setGeneratingCv] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const automaticCvAttempt = useRef('');
   const types: ApplicantDocument['document_type'][] = ['english_test', 'ielts', 'degree', 'other'];
   const requiredTypes: ApplicantDocument['document_type'][] = ['english_test', 'ielts', 'degree'];
-  const allDocumentsAnalyzed = requiredTypes.every((type) => documents.some((document) => document.document_type === type && document.ai_analysis !== null))
-    && documents.every((document) => document.ai_analysis !== null);
+  const latestDocuments = new Map<ApplicantDocument['document_type'], ApplicantDocument>();
+  documents.forEach((document) => {
+    const current = latestDocuments.get(document.document_type);
+    if (!current || document.uploaded_at > current.uploaded_at) latestDocuments.set(document.document_type, document);
+  });
+  const requiredDocumentsReady = requiredTypes.every((type) => {
+    const analysis = latestDocuments.get(type)?.ai_analysis;
+    return analysis?.documentTypeMatch === true && analysis.readable === true;
+  });
+  const automaticCvKey = requiredTypes.map((type) => {
+    const document = latestDocuments.get(type);
+    return `${document?.id ?? 'missing'}:${JSON.stringify(document?.ai_analysis ?? null)}`;
+  }).join('|');
   const uploadDocument = async (type: ApplicantDocument['document_type'], event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -762,14 +780,19 @@ function DocumentsStage({ session, documents, documentsLoaded, documentsLoadErro
     }
     try {
       await onDocumentsChanged();
-      setNotice('AI content check complete. This is not an authenticity check or admin verification.');
+      const hasPossibleIssue = data.analysis.documentTypeMatch !== true
+        || data.analysis.readable !== true
+        || (Array.isArray(data.analysis.issues) && data.analysis.issues.length > 0);
+      setNotice(hasPossibleIssue
+        ? 'The AI noticed a possible document issue. Review the notes below and upload a replacement if needed; an admin will make the decision.'
+        : 'AI content check complete. This is not an authenticity check or admin verification.');
     } catch {
       setError('The analysis completed, but the document list could not be refreshed.');
     } finally {
       setBusyDocument('');
     }
   };
-  const generateCv = async () => {
+  const generateCv = useCallback(async (automatic = false) => {
     if (!aiConsent) {
       setError('Please consent to AI processing of your uploaded documents before generating a CV.');
       return;
@@ -790,9 +813,17 @@ function DocumentsStage({ session, documents, documentsLoaded, documentsLoadErro
       generatedAt: typeof data.cv.generatedAt === 'string' ? data.cv.generatedAt : new Date().toISOString(),
     };
     onCvGenerated(draft);
-    setNotice('CV draft created. Please review and correct it before using it.');
+    setNotice(automatic
+      ? 'Your analyzed documents were used to create a CV draft automatically. Review and correct it before using it.'
+      : 'CV draft created. Please review and correct it before using it.');
     setGeneratingCv(false);
-  };
+  }, [aiConsent, onCvGenerated]);
+  useEffect(() => {
+    if (!aiConsent || !documentsLoaded || !requiredDocumentsReady || cvDraft || generatingCv
+        || automaticCvAttempt.current === automaticCvKey) return;
+    automaticCvAttempt.current = automaticCvKey;
+    void generateCv(true);
+  }, [aiConsent, automaticCvKey, cvDraft, documentsLoaded, generateCv, generatingCv, requiredDocumentsReady]);
   const downloadCv = () => {
     if (!cvDraft) return;
     const url = URL.createObjectURL(new Blob([cvDraft.cvText], { type: 'text/plain;charset=utf-8' }));
@@ -817,23 +848,23 @@ function DocumentsStage({ session, documents, documentsLoaded, documentsLoadErro
     <label className="consent-check document-consent"><input type="checkbox" checked={aiConsent} onChange={(event) => setAiConsent(event.target.checked)} /> I consent to OpenAI processing document contents to check readability/type and extract facts for an editable CV. AI cannot confirm authenticity or replace reviewer verification.</label>
     {types.map((type) => <section className="document-upload-group" key={type}>
       <div><b>{typeLabels[type]}</b><span>PDF, JPG, or PNG · up to 10 MB</span></div>
-      <label className="button secondary upload-button">{busyDocument === type ? 'Uploading…' : 'Choose file'}<input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" disabled={!isSupabaseConfigured || busyDocument !== ''} onChange={(event) => void uploadDocument(type, event)} /></label>
+      <label className="button secondary upload-button">{busyDocument === type ? 'Uploading…' : documents.some((document) => document.document_type === type && document.ai_analysis && (!document.ai_analysis.documentTypeMatch || !document.ai_analysis.readable)) ? 'Upload replacement' : 'Choose file'}<input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" disabled={!isSupabaseConfigured || busyDocument !== ''} onChange={(event) => void uploadDocument(type, event)} /></label>
       {documents.filter((document) => document.document_type === type).map((document) => <article className="uploaded-document" key={document.id}>
         <div className="uploaded-document-heading"><FileCheck2 size={18} /><div><b>{document.file_name}</b><span>{(document.file_size / (1024 * 1024)).toFixed(2)} MB · Awaiting reviewer verification</span></div>
           <button className="text-link" disabled={busyDocument !== ''} onClick={() => void analyzeDocument(document)}>{busyDocument === document.id ? 'Checking…' : document.ai_analysis ? 'Recheck with AI' : 'AI content check'}</button>
         </div>
-        {document.ai_analysis && <div className="document-ai-result"><b>AI content check only — a human must verify this document</b><p>Document type appears {document.ai_analysis.documentTypeMatch ? 'consistent' : 'inconsistent'} with the selected category; text is {document.ai_analysis.readable ? 'readable' : 'not clearly readable'}.</p><p>{document.ai_analysis.summary}</p>{document.ai_analysis.extractedFacts.length > 0 && <p>Extracted: {document.ai_analysis.extractedFacts.join(' · ')}</p>}{document.ai_analysis.issues.length > 0 && <p>Check: {document.ai_analysis.issues.join(' · ')}</p>}</div>}
+        {document.ai_analysis && <div className="document-ai-result"><b>AI content check only — a human must verify this document</b><p>Document type appears {document.ai_analysis.documentTypeMatch ? 'consistent' : 'inconsistent'} with the selected category; text is {document.ai_analysis.readable ? 'readable' : 'not clearly readable'}.</p><p>{document.ai_analysis.summary}</p>{document.ai_analysis.extractedFacts.length > 0 && <p>Extracted: {document.ai_analysis.extractedFacts.join(' · ')}</p>}{document.ai_analysis.issues.length > 0 && <p>Check: {document.ai_analysis.issues.join(' · ')}</p>}{(!document.ai_analysis.documentTypeMatch || !document.ai_analysis.readable) && <p className="document-replacement-hint">AI may be mistaken. Upload a clearer or correctly categorized replacement if needed. This finding is visible to the admin but does not make the decision.</p>}</div>}
       </article>)}
     </section>)}
     {error && <div className="inline-error">{error}</div>}{notice && <p className="success-message">{notice}</p>}
-    <div className="cv-panel"><div><span className="mini-label">YOUR CV DRAFT</span><p>{allDocumentsAnalyzed ? 'Create an editable CV using your profile and AI-extracted document facts.' : 'Upload and run the optional AI content check on your documents to prepare a CV draft.'}</p></div><button className="button primary" disabled={!isSupabaseConfigured || !allDocumentsAnalyzed || generatingCv} onClick={() => void generateCv()}>{generatingCv ? 'Creating CV…' : cvDraft ? 'Regenerate CV' : 'Create CV draft'} <ArrowRight size={16} /></button>
+    <div className="cv-panel"><div><span className="mini-label">YOUR CV DRAFT</span><p>{requiredDocumentsReady ? 'Your CV is generated automatically from your profile and readable, matching required document facts.' : 'Analyze readable English test, IELTS, and degree documents to automatically prepare your CV draft.'}</p></div><button className="button primary" disabled={!isSupabaseConfigured || !requiredDocumentsReady || generatingCv} onClick={() => void generateCv()}>{generatingCv ? 'Creating CV…' : cvDraft ? 'Regenerate CV' : 'Create CV draft'} <ArrowRight size={16} /></button>
       {cvDraft && <div className="cv-draft"><pre>{cvDraft.cvText}</pre><button className="button secondary" onClick={downloadCv}>Download editable text</button><details><summary>Optional improvement suggestions</summary><ul>{cvDraft.improvementTips.map((tip, index) => <li key={`${index}-${tip}`}>{tip}</li>)}</ul></details></div>}
     </div>
     <div className="upload-note"><ShieldCheck size={18} /><span>Uploads are private. The AI check does not verify authenticity; only an authorised reviewer can make the application decision.</span></div>
   </div>;
 }
-function QualificationStage({ analysis }: { analysis: VideoAnalysis | null }) {
-  if (!analysis) return <div className="stage-panel result-panel"><div className="result-orb"><BadgeCheck size={31} /></div><span className="mini-label">STEP 03 / 04 · OPTIONAL INTERVIEW PRACTICE</span><h2>No interview feedback yet</h2><p>Record a short interview to get a transcript, communication tips, and a comparison between what you say and the details in your saved profile. It does not score your eligibility or affect the reviewer’s decision.</p></div>;
+function QualificationStage({ analysis, onVideo }: { analysis: VideoAnalysis | null; onVideo: () => void }) {
+  if (!analysis) return <div className="stage-panel result-panel"><div className="result-orb"><BadgeCheck size={31} /></div><span className="mini-label">STEP 03 / 04 · OPTIONAL INTERVIEW PRACTICE</span><h2>No interview feedback yet</h2><p>Record a short interview to get a transcript, communication tips, and a comparison between what you say and the details in your saved profile. It does not score your eligibility or affect the reviewer’s decision.</p><button className="button primary" onClick={onVideo}><Video size={17} /> Open camera and microphone <ArrowRight size={16} /></button></div>;
   const comparisonLabels: Record<ProfileComparison['field'], string> = {
     education: 'Education',
     germanLevel: 'German level',
@@ -847,13 +878,155 @@ function QualificationStage({ analysis }: { analysis: VideoAnalysis | null }) {
     not_mentioned: 'Not mentioned in interview',
     unclear: 'Unclear from the transcript',
   };
-  return <div className="stage-panel result-panel"><div className="result-orb"><Mic size={31} /></div><span className="mini-label">OPTIONAL INTERVIEW FEEDBACK</span><h2>Your transcript and feedback</h2><p>{analysis.summary}</p><div className="analysis-extract"><span className="mini-label">SPEECH-TO-TEXT TRANSCRIPT</span><p>{analysis.transcript}</p></div>{analysis.profileComparisons && <section className="profile-comparison"><h3>Interview vs. your profile</h3><p>These are AI-detected text comparisons only. A possible difference is a prompt to check your own entries, not proof that either statement is wrong.</p>{analysis.profileComparisons.map((item) => <article className={`profile-comparison-item ${item.status}`} key={item.field}><div><b>{comparisonLabels[item.field]}</b><span>{comparisonStatuses[item.status]}</span></div><p><strong>Your profile:</strong> {item.profileValue || 'No value saved'}</p><p><strong>Heard in the interview:</strong> {item.spokenEvidence || 'No related statement detected'}</p><small>{item.explanation}</small></article>)}</section>}<div className="qualification-grid"><div><span>Points you covered</span>{analysis.highlights.length ? analysis.highlights.map((item, index) => <b key={`${index}-${item}`}>{item}</b>) : <b>No highlights returned</b>}</div><div><span>Optional improvements</span>{analysis.speakingTips.length ? analysis.speakingTips.map((item, index) => <b key={`${index}-${item}`}>{item}</b>) : <b>No suggestions returned</b>}</div></div><p className="review-disclaimer">Feedback compares only the words transcribed with the profile details you entered. Transcription and AI comparisons can be mistaken; they cannot verify facts or judge honesty. Communication suggestions are optional and may be ignored. No appearance, expression, accent, emotion, or eligibility assessment is made.</p></div>;
+  return <div className="stage-panel result-panel"><div className="result-orb"><Mic size={31} /></div><span className="mini-label">OPTIONAL INTERVIEW FEEDBACK</span><h2>Your transcript and feedback</h2><p>{analysis.summary}</p><div className="analysis-extract"><span className="mini-label">SPEECH-TO-TEXT TRANSCRIPT</span><p>{analysis.transcript}</p></div>{analysis.profileComparisons && <section className="profile-comparison"><h3>Interview vs. your profile</h3><p>These are AI-detected text comparisons only. A possible difference is a prompt to check your own entries, not proof that either statement is wrong.</p>{analysis.profileComparisons.map((item) => <article className={`profile-comparison-item ${item.status}`} key={item.field}><div><b>{comparisonLabels[item.field]}</b><span>{comparisonStatuses[item.status]}</span></div><p><strong>Your profile:</strong> {item.profileValue || 'No value saved'}</p><p><strong>Heard in the interview:</strong> {item.spokenEvidence || 'No related statement detected'}</p><small>{item.explanation}</small></article>)}</section>}<div className="qualification-grid"><div><span>Points you covered</span>{analysis.highlights.length ? analysis.highlights.map((item, index) => <b key={`${index}-${item}`}>{item}</b>) : <b>No highlights returned</b>}</div><div><span>Optional improvements</span>{analysis.speakingTips.length ? analysis.speakingTips.map((item, index) => <b key={`${index}-${item}`}>{item}</b>) : <b>No suggestions returned</b>}</div></div><p className="review-disclaimer">Feedback compares only the words transcribed with the profile details you entered. Transcription and AI comparisons can be mistaken; they cannot verify facts or judge honesty. Communication suggestions are optional and may be ignored. No appearance, expression, accent, emotion, or eligibility assessment is made.</p><button className="button secondary" onClick={onVideo}><Video size={17} /> Record another interview</button></div>;
 }
-function PathwayStage({ application }: { application: Application }) {
+function PathwayStage({ application, session, onReviewUpdate }: { application: Application; session: Session | null; onReviewUpdate: (reviewStatus: Application['reviewStatus'], reviewNote: string) => void }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState('');
   const accepted = application.reviewStatus === 'accepted';
   const destination = application.city || 'your selected city';
-  const route = application.goal || 'your selected route';
-  return <div className="stage-panel pathway-panel"><div className="stage-heading"><div><span className="mini-label">STEP 04 / 04 · YOUR GERMANY GUIDE</span><h2>{accepted ? `Next steps for ${destination}` : 'Your next steps, when ready'}</h2><p>{accepted ? `Your reviewer accepted your application for ${route}. Use this checklist to plan; confirm details with your institution or employer.` : 'Your city- and route-specific guide unlocks after an admin accepts your application.'}</p></div><span className="coming-pill">{accepted ? 'Accepted' : 'Awaiting admin decision'}</span></div><div className="pathway-cards"><div><Building2 size={21} /><span>{application.goal.toLowerCase().includes('study') ? 'Institutes and courses' : 'Training or work places'}</span><p>Ask your selected institute, employer, or training provider for confirmed vacancies, dates, and entry requirements in {destination}.</p></div><div><Home size={21} /><span>Accommodation</span><p>Compare verified housing options near your confirmed destination and check current costs before booking.</p></div><div><BookOpen size={21} /><span>What to prepare</span><p>Use your provider’s official checklist for documents, travel, banking, and arrival arrangements.</p></div></div><div className="locked-message"><LockKeyhole size={18} /> This is planning guidance, not a live directory or a visa/legal decision. Verify providers and requirements directly.</div></div>;
+  const route = application.goal.toLowerCase();
+  const routeType = route.includes('study') ? 'study' : route.includes('training') || route.includes('ausbildung') ? 'training' : 'work';
+  const refreshDecision = useCallback(async () => {
+    if (!session || !isSupabaseConfigured) return;
+    setRefreshing(true);
+    setRefreshError('');
+    const { data, error } = await supabase.from('applications')
+      .select('review_status, review_note')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    setRefreshing(false);
+    if (error) {
+      console.error('application decision refresh failed', error);
+      setRefreshError('The latest reviewer decision could not be loaded. Please try again.');
+      return;
+    }
+    if (data) {
+      onReviewUpdate(
+        data.review_status === 'accepted' || data.review_status === 'rejected' ? data.review_status : 'pending',
+        data.review_note ?? '',
+      );
+    }
+  }, [onReviewUpdate, session]);
+
+  useEffect(() => {
+    if (!session || !isSupabaseConfigured || application.reviewStatus !== 'pending') return;
+    void refreshDecision();
+    const interval = window.setInterval(() => void refreshDecision(), 15000);
+    return () => window.clearInterval(interval);
+  }, [application.reviewStatus, refreshDecision, session]);
+
+  const routeDetails = routeType === 'study'
+    ? {
+        heading: 'Find a suitable study programme',
+        description: `Compare degree programmes and confirm admission dates, language requirements, tuition, and required documents directly with universities serving ${destination}.`,
+        linkLabel: 'Explore DAAD study programmes',
+        link: 'https://www.daad.de/en/studying-in-germany/universities/all-degree-programmes/',
+      }
+    : routeType === 'training'
+      ? {
+          heading: 'Plan your vocational training search',
+          description: `Search for training opportunities in or near ${destination}. Confirm the employer, start date, German-language level, pay, and contract directly before applying.`,
+          linkLabel: 'Explore official training guidance',
+          link: 'https://www.make-it-in-germany.com/en/study-vocational-training/training-in-germany',
+        }
+      : {
+          heading: 'Plan your job search',
+          description: `Search for jobs in or near ${destination}. Check role requirements, qualifications, language expectations, and work authorization with the employer and official sources.`,
+          linkLabel: 'Open the Federal Employment Agency job search',
+          link: 'https://www.arbeitsagentur.de/jobsuche/',
+        };
+
+  return <div className="stage-panel pathway-panel">
+    <div className="stage-heading"><div><span className="mini-label">STEP 04 / 04 · YOUR GERMANY GUIDE</span><h2>{accepted ? `Next steps for ${destination}` : 'Your next steps, when ready'}</h2><p>{accepted ? `Your reviewer accepted your application for ${application.goal}. Use this guide to plan and confirm each requirement with the relevant provider.` : 'Your personalised Germany guide unlocks after an admin accepts your application.'}</p></div><span className="coming-pill">{accepted ? 'Guide unlocked' : 'Awaiting admin decision'}</span></div>
+    {!accepted ? <div className="locked-message"><LockKeyhole size={18} /><span>Your reviewer’s decision will unlock guidance for your selected {routeType === 'study' ? 'study route' : routeType === 'training' ? 'training route' : 'work route'}, including next steps for providers and accommodation.</span></div> : <>
+      {application.reviewNote && <div className="pathway-review-note"><BadgeCheck size={18} /><div><b>Message from your reviewer</b><p>{application.reviewNote}</p></div></div>}
+      <div className="pathway-cards">
+        <div><Building2 size={21} /><span>{routeDetails.heading}</span><p>{routeDetails.description}</p><a href={routeDetails.link} target="_blank" rel="noreferrer">{routeDetails.linkLabel} <ArrowRight size={14} /></a></div>
+        <div><Home size={21} /><span>Plan accommodation in {destination}</span><p>Compare locations near your confirmed university, training provider, or workplace. Check contract terms, deposit, monthly costs, and transport before paying or booking.</p></div>
+        <div><BookOpen size={21} /><span>Prepare for your route</span><p>Ask your provider for its current application and arrival checklist. Keep original certificates available and confirm translation or recognition requirements before arranging them.</p></div>
+      </div>
+      <div className="locked-message"><ShieldCheck size={18} /> Acceptance unlocks planning guidance; it is not an admission offer, job contract, visa decision, or verified housing reservation. Confirm current details with official sources and your provider.</div>
+    </>}
+    {refreshError && <div className="inline-error">{refreshError}</div>}
+    <button className="text-link pathway-refresh" onClick={() => void refreshDecision()} disabled={refreshing || !session}>{refreshing ? 'Checking decision…' : 'Refresh reviewer decision'} <ArrowRight size={15} /></button>
+  </div>;
+}
+
+type JourneyAssistantMessage = { role: 'user' | 'assistant'; content: string };
+
+async function journeyAssistantErrorMessage(error: unknown): Promise<string> {
+  if (error && typeof error === 'object' && 'context' in error && error.context instanceof Response) {
+    try {
+      const payload: unknown = await error.context.clone().json();
+      if (payload && typeof payload === 'object' && 'error' in payload && typeof payload.error === 'string') {
+        return payload.error;
+      }
+    } catch (responseError) {
+      console.error('journey assistant error response could not be read', responseError);
+    }
+    if (error.context.status === 503) return 'The AI guide is not configured yet. Please ask the site administrator to add the OpenAI API key in Supabase Edge Function secrets.';
+  }
+  return 'The AI guide could not answer right now. Please try again later.';
+}
+
+function JourneyAssistant({ session, application, onClose }: { session: Session | null; application: Application; onClose: () => void }) {
+  const [messages, setMessages] = useState<JourneyAssistantMessage[]>([
+    { role: 'assistant', content: 'Hi! I can help with your Educaro steps, documents, study or work planning, and settling in Germany. What would you like help with?' },
+  ]);
+  const [draft, setDraft] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, busy]);
+
+  const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = draft.trim();
+    if (!text || busy) return;
+    if (!session || !isSupabaseConfigured) {
+      setError('Sign in to use the personalised AI guide.');
+      return;
+    }
+    const userMessage: JourneyAssistantMessage = { role: 'user', content: text };
+    const history = [...messages.slice(-7), userMessage];
+    setMessages((current) => [...current, userMessage]);
+    setDraft('');
+    setError('');
+    setBusy(true);
+    try {
+      const { data, error: requestError } = await supabase.functions.invoke('journey-assistant', {
+        body: { messages: history, stage: application.reviewStatus === 'accepted' ? 'accepted' : 'journey' },
+      });
+      if (requestError || typeof data?.reply !== 'string') {
+        console.error('journey assistant request failed', requestError);
+        setError(typeof data?.error === 'string'
+          ? data.error
+          : requestError
+            ? await journeyAssistantErrorMessage(requestError)
+            : 'The AI guide returned an invalid answer. Please try again.');
+        return;
+      }
+      setMessages((current) => [...current, { role: 'assistant', content: data.reply }]);
+    } catch (requestError) {
+      console.error('journey assistant request failed unexpectedly', requestError);
+      setError('We could not reach the AI guide. Check your connection and try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return <section className="journey-assistant" aria-label="Educaro AI guide">
+    <header><div><Bot size={19} /><div><b>Educaro AI guide</b><small>{application.reviewStatus === 'accepted' ? 'Your accepted pathway' : 'Your Germany journey'}</small></div></div><button type="button" onClick={onClose} aria-label="Close AI guide"><X size={18} /></button></header>
+    <div className="assistant-messages" aria-live="polite">{messages.map((message, index) => <p key={`${message.role}-${index}`} className={`assistant-message ${message.role}`}>{message.content}</p>)}{busy && <p className="assistant-message assistant">Thinking…</p>}<div ref={messageEndRef} /></div>
+    {(!session || !isSupabaseConfigured) && <p className="assistant-hint">{session ? 'Connect and sign in to your secure account to ask the AI guide.' : 'Sign in to your applicant account before asking the AI guide.'}</p>}
+    {error && <div className="inline-error assistant-error">{error}</div>}
+    <form className="assistant-form" onSubmit={(event) => void sendMessage(event)}><textarea value={draft} onChange={(event) => setDraft(event.target.value.slice(0, 1500))} placeholder="Ask about your next step…" maxLength={1500} rows={2} disabled={busy || !session || !isSupabaseConfigured} /><button className="button primary" type="submit" aria-label="Send message" disabled={busy || !session || !isSupabaseConfigured || !draft.trim()}><Send size={16} /></button></form>
+    <small className="assistant-disclaimer">AI guidance can be inaccurate. Verify requirements with official sources; do not share passwords or sensitive personal data.</small>
+  </section>;
 }
 
 function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAnalysis, onComplete }: { session: Session | null; application: Application; onBack: () => void; onProfile: () => void; onSaveVideo: (path: string) => Promise<void>; onAnalysis: (analysis: VideoAnalysis) => Promise<void>; onComplete: () => void }) {
@@ -875,8 +1048,20 @@ function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAna
       setError('Secure video storage and AI review require a configured Supabase project. You can still save your profile.');
       return;
     }
+    if (!session) {
+      setError('Sign in to securely save and submit your interview recording.');
+      return;
+    }
     if (!profileIsComplete(application)) {
       setError('Complete and save your applicant profile before recording.');
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia || !window.isSecureContext) {
+      setError('Camera and microphone access requires a supported browser on HTTPS or localhost. Open this site on localhost or its secure website address.');
+      return;
+    }
+    if (typeof MediaRecorder === 'undefined') {
+      setError('Video recording is not supported in this browser. Try the latest Chrome or Edge.');
       return;
     }
     try {
@@ -886,32 +1071,50 @@ function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAna
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
-      const recorder = new MediaRecorder(stream);
+      const supportedMimeType = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
+        .find((mimeType) => MediaRecorder.isTypeSupported(mimeType));
+      if (!supportedMimeType) {
+        throw new Error('This browser cannot record video in the supported format. Try the latest Chrome or Edge.');
+      }
+      const recorder = new MediaRecorder(stream, { mimeType: supportedMimeType });
       chunksRef.current = [];
       recorder.ondataavailable = (event: BlobEvent) => {
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
       recorder.onstop = async () => {
-        setHasRecording(true);
-        if (!session || chunksRef.current.length === 0) return;
-        const file = new File(chunksRef.current, 'introduction.webm', { type: 'video/webm' });
-        if (file.size > 25 * 1024 * 1024) {
+        stream.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        const mimeType = recorder.mimeType || supportedMimeType;
+        const video = new Blob(chunksRef.current, { type: mimeType });
+        if (video.size === 0) {
+          setError('No video was captured. Check camera and microphone access, then record again.');
+          return;
+        }
+        if (video.size > 25 * 1024 * 1024) {
           setError('This video is over the 25 MB analysis limit. Please record a shorter introduction and try again.');
           return;
         }
-        setUploading(true);
+        const file = new File([video], 'introduction.webm', { type: mimeType });
         const path = `${session.user.id}/${crypto.randomUUID()}.webm`;
+        setHasRecording(true);
+        setUploading(true);
         try {
-          const { error: uploadError } = await supabase.storage.from('private-applicant-media').upload(path, file, { contentType: 'video/webm', upsert: false });
+          const { error: uploadError } = await supabase.storage.from('private-applicant-media').upload(path, file, { contentType: mimeType, upsert: false });
           if (uploadError) throw uploadError;
           await onSaveVideo(path);
           setVideoPath(path);
         } catch (uploadError) {
           console.error('video upload or record save failed', uploadError);
-          setError('The recording is ready, but it could not be saved securely. Please try again.');
+          setError('The recording could not be saved. Check your connection and storage access, then record again.');
         } finally {
           setUploading(false);
         }
+      };
+      recorder.onerror = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        setRecording(false);
+        setError('The recording stopped unexpectedly. Check browser permissions and try again.');
       };
       recorderRef.current = recorder;
       recorder.start();
@@ -922,8 +1125,20 @@ function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAna
       setVideoPath('');
     } catch (cameraError) {
       streamRef.current?.getTracks().forEach((track) => track.stop());
-      console.error('camera access failed', cameraError);
-      setError('Camera and microphone access is needed for the introduction. Allow access in your browser settings and try again.');
+      streamRef.current = null;
+      if (cameraError instanceof Error && cameraError.message.startsWith('This browser cannot record')) {
+        setError(cameraError.message);
+      } else {
+        console.error('camera or microphone access failed', cameraError);
+        const errorName = cameraError instanceof DOMException ? cameraError.name : '';
+        setError(errorName === 'NotAllowedError' || errorName === 'SecurityError'
+          ? 'Allow camera and microphone access for this site in your browser’s address-bar or site settings, then try again.'
+          : errorName === 'NotFoundError'
+            ? 'No camera or microphone was found. Connect or enable both devices, then try again.'
+            : errorName === 'NotReadableError'
+              ? 'The camera or microphone is busy in another app. Close other apps using them and try again.'
+              : 'Camera and microphone could not be started. Check browser permissions and device settings, then try again.');
+      }
     }
   };
   const stopRecording = () => {
@@ -932,7 +1147,6 @@ function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAna
       recordingTimeoutRef.current = null;
     }
     if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
-    streamRef.current?.getTracks().forEach((track) => track.stop());
     setRecording(false);
   };
   const analyzeRecording = async () => {
@@ -999,7 +1213,7 @@ function VideoView({ session, application, onBack, onProfile, onSaveVideo, onAna
         {hasRecording && !recording && <div className="recording-complete">
           <div>{uploading ? 'Saving securely…' : videoPath ? <><Check size={16} /> Recording saved securely</> : 'Recording ready — save it to continue'}</div>
           <label className="consent-check"><input type="checkbox" checked={aiConsent} onChange={(event) => setAiConsent(event.target.checked)} /> I agree to send the audio to OpenAI for transcription and comparison with the profile details I entered. The AI may be wrong and does not assess appearance or eligibility.</label>
-          <button className="button primary" onClick={analyzeRecording} disabled={uploading || analyzing || !videoPath}>{uploading ? 'Saving…' : analyzing ? 'Transcribing and comparing…' : 'Get interview feedback'} <ArrowRight size={16} /></button>
+          <button className="button primary" onClick={analyzeRecording} disabled={uploading || analyzing || !videoPath}>{uploading ? 'Saving recording…' : analyzing ? 'Transcribing and comparing…' : 'Submit recording for feedback'} <ArrowRight size={16} /></button>
           <button className="retry-link" onClick={() => { setHasRecording(false); setVideoPath(''); setAnalysisError(''); }}>Record again</button>
         </div>}
         <p className="recorder-caption"><ShieldCheck size={14} /> Short interview: transcript, communication suggestions, and profile consistency prompts. It does not affect the admin decision.</p>
@@ -1048,7 +1262,7 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
         ? 'This verified email is not configured for admin access.'
         : otpError?.status === 429
           ? 'Wait one minute before requesting another admin code.'
-          : otpError?.message ?? 'Admin email verification could not be started.'));
+          : 'Admin email verification could not be started. Please try again later.'));
       return;
     }
     setCodeSent(true);
@@ -1056,10 +1270,17 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
     setNotice('A one-time verification code was sent to the configured admin inbox.');
   };
 
+  const completeApplicantSignIn = async (userId: string) => {
+    setBusy(false);
+    onSuccess('applicant', userId);
+  };
+
   const sendCode = async () => {
     const normalizedEmail = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || !password || (mode === 'signup' && !name.trim())) {
-      setError(mode === 'signup' ? 'Enter your name, a valid email address, and a password.' : 'Enter a valid email address and password.');
+      setError(mode === 'signup'
+        ? 'Enter your name, a valid email address, and a password.'
+        : 'Enter a valid email address and password.');
       return;
     }
     if (!isSupabaseConfigured) {
@@ -1074,7 +1295,9 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
         : await signInLocalAccount({ email: normalizedEmail, password });
       setBusy(false);
       if (result.error) {
-        setError(result.error.message);
+        setError(mode === 'signin' && /invalid login credentials|incorrect email or password/i.test(result.error.message)
+          ? "We couldn't sign you in with those details. Check your email and password, or create an account if you're new."
+          : result.error.message);
         if (mode === 'signup' && /already|exists/i.test(result.error.message)) setMode('signin');
         return;
       }
@@ -1097,48 +1320,51 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
       return;
     }
 
-    const result = mode === 'signup'
-      ? await supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
-          options: { data: { display_name: name.trim() } },
-        })
-      : await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
-    if (result.error) {
-      setBusy(false);
-      setError(result.error.message || 'Your account could not be verified. Please try again.');
-      if (mode === 'signup' && /already|registered|exists/i.test(result.error.message)) setMode('signin');
-      return;
-    }
-    if (mode === 'signup' && !result.data.session) {
-      setBusy(false);
-      setMode('signin');
-      setNotice('Check your email to confirm your account, then sign in with your email and password.');
-      return;
-    }
-    if (!result.data.user || !result.data.session) {
-      setBusy(false);
-      setError('Your account session could not be verified. Please try again.');
-      return;
-    }
-
-    const { data: roleData, error: roleError } = await supabase.functions.invoke('resolve-account-role', { body: {} });
-    if (roleError || (roleData?.role !== 'admin' && roleData?.role !== 'applicant')) {
-      console.error('account role resolution failed', roleError);
-      await supabase.auth.signOut();
-      setBusy(false);
-      if (roleData?.adminOtpRequired === true) {
-        setMode('admin');
-        setError('This configured admin account must complete the separate email-code verification.');
-      } else if (roleError?.status === 404) {
-        setError('Sign-in is unavailable because the Supabase account-role function has not been deployed. Deploy resolve-account-role, then try again.');
-      } else {
-        setError(roleData?.error ?? roleError?.message ?? 'Your account access could not be resolved.');
+    try {
+      const result = mode === 'signup'
+        ? await supabase.auth.signUp({
+            email: normalizedEmail,
+            password,
+            options: { data: { display_name: name.trim() } },
+          })
+        : await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+      if (result.error) {
+        setBusy(false);
+        if (mode === 'signup' && /already|registered|exists/i.test(result.error.message)) {
+          setMode('signin');
+          setError('An account already exists for this email. Sign in instead.');
+        } else if (mode === 'signin' && /invalid login credentials/i.test(result.error.message)) {
+          setError("We couldn't sign you in with those details. Check your email and password, or create an account if you're new.");
+        } else if (/error sending confirmation email|smtp|email provider/i.test(result.error.message)) {
+          console.error('applicant signup confirmation email failed', result.error);
+          setError('We could not send the account confirmation email. Check the Supabase SMTP sender and email template settings.');
+        } else {
+          console.error('applicant authentication failed', result.error);
+          setError(mode === 'signup'
+            ? 'Your account could not be created. Check your details and try again.'
+            : 'We could not sign you in. Please try again.');
+        }
+        return;
       }
-      return;
+
+      if (mode === 'signup' && !result.data.session) {
+        setBusy(false);
+        setMode('signin');
+        setPassword('');
+        setNotice('Your account was created. Check your email to confirm it, then sign in with your email and password.');
+        return;
+      }
+      if (!result.data.user || !result.data.session) {
+        setBusy(false);
+        setError('Your account session could not be verified. Please try again.');
+        return;
+      }
+      await completeApplicantSignIn(result.data.user.id);
+    } catch (authError) {
+      console.error('applicant authentication failed unexpectedly', authError);
+      setBusy(false);
+      setError('The sign-in service could not be reached. Check your connection and try again.');
     }
-    setBusy(false);
-    onSuccess(roleData.role, result.data.user.id);
   };
 
   const verifyAdminCode = async () => {
@@ -1152,7 +1378,7 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
     setBusy(false);
     if (verifyError || data?.role !== 'admin' || !adminUserId) {
       console.error('admin email OTP verification failed', verifyError);
-      setError(data?.error ?? verifyError?.message ?? 'The admin verification code is invalid or expired.');
+      setError(data?.error ?? 'The admin verification code could not be verified. Check the code and try again.');
       return;
     }
     onSuccess('admin', adminUserId);
@@ -1170,7 +1396,7 @@ function ApplicantAuth({ onClose, onSuccess, initialMode, initialError }: {
   };
 
   const isAdminMode = mode === 'admin';
-  return <div className="modal-backdrop" onClick={() => { if (!busy) close(); }}><div className="login-modal" onClick={(event) => event.stopPropagation()}><button className="close-button" onClick={close} disabled={busy}><X size={18} /></button><div className="modal-icon">{isAdminMode ? <LockKeyhole size={21} /> : <Sparkles size={21} />}</div><span className="mini-label">{isAdminMode ? 'PRIVATE REVIEWER ACCESS' : 'YOUR PRIVATE JOURNEY'}</span><h2>{isAdminMode ? 'Admin workspace' : mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2><p>{isAdminMode ? 'Sign in with the fixed reviewer account, then verify the one-time code sent to its configured email.' : isSupabaseConfigured ? 'Create an account or sign in securely with your email and password.' : 'Preview mode only: accounts are stored in this browser and are not secure. Do not enter real personal information.'}</p>{mode === 'signup' && <label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your full name" disabled={codeSent} /></label>}<label>Email address<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" disabled={codeSent} /></label><label>{isSupabaseConfigured ? 'Password' : 'Preview password'}<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={isSupabaseConfigured ? 'Enter your password' : 'Preview-only password'} style={{ flex: 1 }} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} disabled={codeSent} /><button type="button" className="switch-auth" onClick={() => setShowPassword((value) => !value)} style={{ margin: 0, padding: 0, minWidth: 'auto', fontSize: 12, whiteSpace: 'nowrap' }}>{showPassword ? <><EyeOff size={14} /> Hide</> : <><Eye size={14} /> Show</>}</button></div></label>{isAdminMode && codeSent && <label>Email verification code<input type="text" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} /></label>}{error && <div className="inline-error">{error}</div>}{notice && <p className="success-message">{notice}</p>}{codeSent ? <><button className="button primary full" onClick={() => void verifyAdminCode()} disabled={busy}>{busy ? 'Verifying…' : 'Verify code and sign in'} <ArrowRight size={16} /></button><button className="switch-auth" onClick={() => void requestAdminCode(false)} disabled={busy}>Send a new code</button></> : <button className="button primary full" onClick={() => void sendCode()} disabled={busy}>{busy ? 'Please wait…' : isAdminMode ? 'Verify reviewer password' : !isSupabaseConfigured ? (mode === 'signup' ? 'Create preview account' : 'Sign in to preview') : (mode === 'signup' ? 'Create account' : 'Sign in with password')} <ArrowRight size={16} /></button>}{isAdminMode ? <button className="switch-auth" onClick={() => switchMode('signin')} disabled={busy}>Sign in as a regular user</button> : <><button className="switch-auth" onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signup')} disabled={busy}>{mode === 'signup' ? 'Already have an account? Sign in' : 'New here? Create an account'}</button><button className="switch-auth" onClick={() => switchMode('admin')} disabled={busy}>Admin? Use reviewer sign-in</button></>}<div className="modal-security"><ShieldCheck size={15} /> {isAdminMode ? 'Admin accounts must be allowlisted and pass both password and email-code checks.' : isSupabaseConfigured ? 'Your data is secured by Supabase account access.' : 'Production authentication is not configured.'}</div></div></div>;
+  return <div className="modal-backdrop" onClick={() => { if (!busy) close(); }}><div className="login-modal" onClick={(event) => event.stopPropagation()}><button className="close-button" onClick={close} disabled={busy}><X size={18} /></button><div className="modal-icon">{isAdminMode ? <LockKeyhole size={21} /> : <Sparkles size={21} />}</div><span className="mini-label">{isAdminMode ? 'PRIVATE REVIEWER ACCESS' : 'YOUR PRIVATE JOURNEY'}</span><h2>{isAdminMode ? 'Admin workspace' : mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2><p>{isAdminMode ? 'Sign in with the fixed reviewer email and password, then verify the one-time code sent to its configured email.' : isSupabaseConfigured ? 'Create an account or sign in securely with your email and password.' : 'Preview mode only: accounts are stored in this browser and are not secure. Do not enter real personal information.'}</p>{mode === 'signup' && <label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your full name" disabled={codeSent} /></label>}<label>Email address<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" disabled={codeSent} /></label><label>{isSupabaseConfigured ? 'Password' : 'Preview password'}<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={isSupabaseConfigured ? 'Enter your password' : 'Preview-only password'} style={{ flex: 1 }} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} disabled={codeSent} /><button type="button" className="switch-auth" onClick={() => setShowPassword((value) => !value)} style={{ margin: 0, padding: 0, minWidth: 'auto', fontSize: 12, whiteSpace: 'nowrap' }}>{showPassword ? <><EyeOff size={14} /> Hide</> : <><Eye size={14} /> Show</>}</button></div></label>{isAdminMode && codeSent && <label>Email verification code<input type="text" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} /></label>}{error && <div className="inline-error">{error}</div>}{notice && <p className="success-message">{notice}</p>}{isAdminMode && codeSent ? <><button className="button primary full" onClick={() => void verifyAdminCode()} disabled={busy}>{busy ? 'Verifying…' : 'Verify code and sign in'} <ArrowRight size={16} /></button><button className="switch-auth" onClick={() => void requestAdminCode(false)} disabled={busy}>Send a new code</button></> : <button className="button primary full" onClick={() => void sendCode()} disabled={busy}>{busy ? 'Please wait…' : isAdminMode ? 'Verify reviewer password' : mode === 'signup' ? 'Create account' : 'Sign in'} <ArrowRight size={16} /></button>}{isAdminMode ? <button className="switch-auth" onClick={() => switchMode('signin')} disabled={busy}>Sign in as a regular user</button> : <><button className="switch-auth" onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signup')} disabled={busy}>{mode === 'signup' ? 'Already have an account? Sign in' : 'New here? Create an account'}</button><button className="switch-auth" onClick={() => switchMode('admin')} disabled={busy}>Admin? Use reviewer sign-in</button></>}<div className="modal-security"><ShieldCheck size={15} /> {isAdminMode ? 'Only the configured admin account can continue after password and email-code verification.' : isSupabaseConfigured ? 'Passwords are handled securely by Supabase Auth.' : 'Production authentication is not configured.'}</div></div></div>;
 }
 type AdminReviewApiApplication = {
   id: string;
@@ -1329,7 +1555,7 @@ function AdminReviewCard({ application, onDecision }: { application: AdminReview
     <details className="admin-applicant-details"><summary>Review profile and documents</summary>
       <dl className="admin-profile-facts"><dt>Education</dt><dd>{String(application.profileData.education || 'Not provided')}</dd><dt>German level</dt><dd>{String(application.profileData.germanLevel || 'Not provided')}</dd><dt>IT experience</dt><dd>{String(application.profileData.itExperience || 'Not provided')}</dd><dt>Interests</dt><dd>{String(application.profileData.interests || 'Not provided')}</dd><dt>Future goal</dt><dd>{String(application.profileData.futureGoal || 'Not provided')}</dd></dl>
       <div className="admin-document-list">{application.documents.length ? application.documents.map((document) => <div className="admin-document-item" key={document.id}>
-        <div><b>{labelForType(document.document_type)} · {document.file_name}</b><span>{document.ai_analysis ? `AI: ${document.ai_analysis.summary}` : 'No AI content check yet'} · Not verified until reviewed by a person</span>{document.ai_analysis?.issues.map((issue, index) => <small key={`${index}-${issue}`}>AI noted: {issue}</small>)}</div>
+        <div><b>{labelForType(document.document_type)} · {document.file_name}</b><span>{document.ai_analysis ? `AI: ${document.ai_analysis.summary}` : 'No AI content check yet'} · Not verified until reviewed by a person</span>{document.ai_analysis && (!document.ai_analysis.documentTypeMatch || !document.ai_analysis.readable) && <small className="document-ai-flag">AI flagged a possible mismatch or readability issue. Review the file; this is not an authenticity finding.</small>}{document.ai_analysis?.issues.map((issue, index) => <small key={`${index}-${issue}`}>AI noted: {issue}</small>)}</div>
         <button className="button secondary" onClick={() => void openDocument(document)}>Open securely</button>
       </div>) : <p>No documents uploaded. No document is marked as verified.</p>}</div>
       {cvData && typeof cvData.cvText === 'string' && <details><summary>Applicant CV draft</summary><pre>{cvData.cvText}</pre></details>}

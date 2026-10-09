@@ -66,12 +66,26 @@ Deno.serve(async (request) => {
     console.error('Applicant documents could not be loaded for CV generation.', documentsError);
     return jsonResponse({ error: 'Your uploaded document details could not be loaded.' }, 500);
   }
+  const latestDocuments = new Map<string, typeof documents[number]>();
+  for (const document of documents ?? []) {
+    latestDocuments.set(document.document_type, document);
+  }
   const requiredTypes = ['english_test', 'ielts', 'degree'];
-  if (!documents?.length
-      || requiredTypes.some((type) => !documents.some((document) => document.document_type === type && isRecord(document.ai_analysis)))
-      || documents.some((document) => !isRecord(document.ai_analysis))) {
+  const requiredDocuments = requiredTypes.map((type) => latestDocuments.get(type));
+  if (requiredDocuments.some((document) => !document || !isRecord(document.ai_analysis))) {
     return jsonResponse({ error: 'Upload and analyze the English test, IELTS, and degree documents before generating a CV.' }, 400);
   }
+  if (requiredDocuments.some((document) => {
+    const analysis = document?.ai_analysis;
+    return !isRecord(analysis) || analysis.documentTypeMatch !== true || analysis.readable !== true;
+  })) {
+    return jsonResponse({ error: 'A required document may be mismatched or unreadable. Upload and analyze a suitable replacement before creating the CV.' }, 400);
+  }
+
+  const usableDocuments = [...latestDocuments.values()].filter((document) => {
+    const analysis = document.ai_analysis;
+    return isRecord(analysis) && analysis.documentTypeMatch === true && analysis.readable === true;
+  });
 
   const applicantFacts = {
     name: application.name,
@@ -82,7 +96,7 @@ Deno.serve(async (request) => {
     itExperience: application.profile_data.itExperience,
     interests: application.profile_data.interests,
     futureGoal: application.profile_data.futureGoal,
-    documents: documents.map((document) => ({
+    documents: usableDocuments.map((document) => ({
       type: document.document_type,
       analysis: document.ai_analysis,
     })),

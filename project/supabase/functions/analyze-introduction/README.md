@@ -16,7 +16,7 @@ Configure backend secrets in the Supabase Dashboard under **Project Settings →
 - `ADMIN_OTP_PEPPER`: a randomly generated secret of at least 32 characters.
 - `RESEND_API_KEY`: the Resend API key used to email admin verification codes and applicant decisions.
 - `EDUCARO_FROM_EMAIL`: a sender address verified with Resend.
-- `OPENAI_API_KEY`: required for interview transcription, document analysis, and CV generation.
+- `OPENAI_API_KEY`: required for interview transcription, document analysis, CV generation, and the signed-in applicant AI guide.
 
 Do not send these secrets in chat, add them to `VITE_*` variables, or commit them. Supabase supplies its standard `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` to Edge Functions automatically.
 
@@ -30,13 +30,19 @@ After the secrets are saved and the CLI is authenticated, run the deployment scr
 
 The script links this project, applies the database migrations, and deploys all required Edge Functions. It stops on the first failed command so incomplete deployment is visible.
 
+The applicant AI guide runs in the authenticated `journey-assistant` Edge Function. It receives a bounded chat history, verifies the applicant's Supabase session, and loads only that user's selected route, city, and review decision. Deploy it with the other functions after `OPENAI_API_KEY` is configured; never expose the key in frontend variables.
+
+Applicants can open the AI guide from the public home page or their workspace; a signed-in Supabase account is required before sending a question. Document checks are advisory: a possible mismatch or unreadable file is shown to the applicant and reviewer, and the applicant can upload a replacement without blocking the human review. After the latest English test, IELTS, and degree documents have all been analyzed as readable and consistent with their selected types, the CV draft is generated and saved automatically. Applicants must consent to AI processing first and should review the draft before using it.
+
 Never put `ADMIN_EMAILS`, `ADMIN_OTP_PEPPER`, service-role keys, or provider keys in a `VITE_*` variable, browser code, or committed file. `supabase/functions/.env` is ignored by Git; use it only for local Edge Function development, for example with `supabase functions serve --env-file supabase/functions/.env`. The frontend needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; Resend must have a verified sender domain/address.
 
-Keep Supabase email/password authentication enabled and require email confirmation for new accounts. Resend delivers a separate, short-lived, single-use verification code for admin sign-in.
+Keep the Supabase Email auth provider enabled for email-and-password accounts and turn off **Confirm email** in Supabase **Authentication → Sign In / Providers**. New applicant accounts then sign in immediately without an account-confirmation email. Reviewer sign-in still requires the fixed admin account's password followed by a separate, short-lived, single-use code sent through Resend.
+
+For Supabase Auth email delivery, enable custom SMTP in Supabase **Authentication → Emails → SMTP Settings**. With Resend, use host `smtp.resend.com`, port `465` or `587`, username `resend`, the Resend API key as the SMTP password, and a sender address on a domain verified with Resend. Enter the key only in the Supabase Dashboard; do not add it to frontend configuration or source control. The Edge Function `RESEND_API_KEY` secret does not configure Supabase Auth SMTP by itself.
 
 ## Admin access and authorization
 
-- Normal accounts register and sign in with email and password. Reviewer sign-in requires the fixed allowlisted account's password followed by a one-time code sent to that account's verified email. The backend derives the email and session ID from the verified Supabase session; no frontend role or email is trusted.
+- Normal accounts register and sign in with email and password through Supabase Auth. Passwords are managed by Supabase Auth and must never be stored by the frontend. Reviewer sign-in requires the fixed allowlisted account's password followed by a one-time code sent to that account's verified email. The backend derives the email and session ID from the verified Supabase session; no frontend role or email is trusted.
 - Only an owner-authorized `ADMIN_EMAILS` address can request a reviewer code. A successful second-factor check authorizes only that specific Supabase session for up to eight hours and initializes the profile's `admin` role. New reviewer accounts must first be registered with the configured address, confirm the email, then complete the reviewer password-and-code flow. There is no public admin-role selection or promotion endpoint, and public profile updates cannot promote an applicant.
 - The admin dashboard, applicant/document listing, signed document links, and review decisions require a verified session whose trusted email is allowlisted and whose profile role is `admin`. The Edge Functions return `401` for missing/invalid sessions and `403` for authenticated non-admins; RLS and private Storage policies also enforce admin access for direct database/storage requests.
 - If the earlier custom `admin-login` function was deployed, remove it: `supabase functions delete admin-login --project-ref YOUR_SUPABASE_PROJECT_REF`, then unset the obsolete `EDUCARO_ADMIN_JWT_SECRET`. `ADMIN_OTP_PEPPER` remains required for the current, session-bound admin email-code flow. Migration `20261009000300_configure_allowlisted_admins.sql` retires the old challenge mechanism and installs the session-bound policies.
@@ -51,7 +57,7 @@ The Vite website is a static frontend; Supabase Auth, database, storage, and Edg
 2. Set the Vercel **Root Directory** to the directory containing `package.json` (usually `project` if the parent repository contains this folder; otherwise `.`).
 3. Use the Vite defaults: build command `npm run build`, output directory `dist`, install command `npm install` (or `npm ci`). The included `vercel.json` configures these and sends SPA routes to `index.html`.
 4. In Vercel **Project Settings → Environment Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for Production and Preview, then redeploy. The Supabase URL and anon/publishable key are browser-visible configuration, not secrets; never put service-role, admin, Resend, or OpenAI secrets in Vercel frontend variables.
-5. After the first deploy, copy the production domain. In Supabase **Authentication → URL Configuration**, set the Site URL to that domain and add it and any required Vercel preview domains to the Redirect URLs. In **Authentication → Providers → Email**, enable password sign-in and email confirmation.
+5. After the first deploy, copy the production domain. In Supabase **Authentication → URL Configuration**, set the Site URL to that domain and add it and any required Vercel preview domains to the Redirect URLs. In **Authentication → Sign In / Providers**, keep email sign-in and user signups enabled and turn off **Confirm email** to prevent applicant account-confirmation emails.
 
 With Vercel's Git integration, commits pushed to the selected production branch deploy automatically; pull requests can have preview deployments.
 
